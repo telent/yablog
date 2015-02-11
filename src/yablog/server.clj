@@ -7,9 +7,6 @@
             [yablog.page :as page]
             [texticlj.core :as tx]))
 
-(defonce all-pages
-  (atom (page/read-pages "/Users/dbarlow/src/personal/my-way/example/articles/")))
-
 (defn hiccup-entry [page]
   (with-open [r (io/reader (:pathname page))]
     (page/read-headers r)
@@ -19,7 +16,7 @@
 (defn recent-entries [req]
   (hiccup/html
    (into [:body]
-         (map hiccup-entry (page/recent-pages 3 @all-pages)))))
+         (map hiccup-entry (page/recent-pages 5 (:pages req))))))
 
 (defroutes handler
   (GET "/" [] recent-entries)

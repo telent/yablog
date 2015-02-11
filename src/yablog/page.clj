@@ -39,7 +39,9 @@
         h))))
 
 (defn textile? [filename]
-  (.endsWith (.toString filename) ".textile"))
+  (and (.endsWith (.toString filename) ".textile")
+       (.exists filename)
+       (.canRead filename)))
 
 (defn slug [name]
   (str/lower-case
