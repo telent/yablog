@@ -33,7 +33,7 @@
 
 (defn read-page [file]
   (with-open [r (io/reader file)]
-    (let [h (read-headers r)]
+    (let [h (assoc (read-headers r) :pathname file ) ]
       (if-let [date (get h :date)]
         (assoc h :date (read-datetime date))
         h))))
@@ -54,8 +54,31 @@
   (let [names (filter textile? (file-seq (io/file path)))]
     (reduce (fn [m name]
               (let [h (read-page name)]
-                (assoc m (slug (get h :title "")) h)))
+                (assoc m (slug (get h :title (:subject h))) h)))
             {}
             names)))
 
-(defonce all-pages (atom {}))
+(defn date-interval-for [y m]
+  (let [date (time/date-time y m)
+        start (time/minus date (time/days 1))
+        end (time/plus date (time/months 1) (time/days 1))]
+    (time/interval start end)))
+
+(defn page-in-date-interval? [interval page]
+  (time/within? interval (:date page) ))
+
+(defn pages-in-month [y m pages]
+  (filter (partial page-in-date-interval?
+                   (date-interval-for y m))
+          (vals pages)))
+
+(defn recent-pages [n pages]
+  (take n
+        (reverse
+         (sort-by :date
+                  (org.joda.time.DateTimeComparator/getInstance)
+                  (vals pages)))))
+
+#_
+(count (filter (partial page-in-date-interval? (date-interval-for 2003 2))
+               (vals @all-pages)))
