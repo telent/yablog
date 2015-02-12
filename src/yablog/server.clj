@@ -19,7 +19,7 @@
   (with-open [r (io/reader (:pathname page))]
     (page/read-headers r)
     (into [:div {:class "entry"}
-           [:h1 {:class "title"} (:subject page)]
+           [:h1 {:class "title"} (or (:subject page) (:title page))]
            [:h2 {:class "date"} (format-time (:date page))]]
           (tx/to-hiccup (slurp r)))))
 
@@ -45,9 +45,18 @@
   (into [:article]
         (map hiccup-entry (page/recent-pages 5 (:pages req)))))
 
+(defn entries-for-month [req]
+  (let [p (:route-params req)]
+    (into [:article]
+          (map hiccup-entry
+               (page/pages-in-month (Integer. (:year p))
+                                    (Integer. (:month p))
+                                    (:pages req))))))
+
 (defroutes handler
   (GET "/" [] (stylify recent-entries))
   (GET "/default.css" [] (io/resource "default.css"))
   (GET "/fonts/*" request (fn [req] (io/resource (subs (:uri req) 1))))
   (GET "/images/*" request (fn [req] (io/resource (subs (:uri req) 1))))
+  (GET "/:year/:month" [year month] (stylify entries-for-month))
   (route/not-found "Page not found"))
