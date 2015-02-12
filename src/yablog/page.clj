@@ -34,11 +34,20 @@
 (assert (= "of_course_the_foo_batr_baz"
            (yablog.page/slug "Of course, the foo batr baz,")))
 
+(defn title [page]
+  (or (:title page) (:subject page)))
+
+(defn url [page]
+  (let [d (:date page)
+        y (time/year d)
+        m (time/month d)]
+    (str "/" y "/" m "/" (slug (title page)))))
+
 (defn read-pages [path]
   (let [names (filter textile? (file-seq (io/file path)))]
     (reduce (fn [m name]
               (let [h (read-page name)]
-                (assoc m (slug (get h :title (:subject h))) h)))
+                (assoc m (url h) h)))
             {}
             names)))
 
@@ -55,6 +64,9 @@
   (filter (partial page-in-date-interval?
                    (date-interval-for y m))
           (vals pages)))
+
+(defn find-page [y m slug pages]
+  (get pages (str "/" y "/" m "/" slug)))
 
 (defn recent-pages [n pages]
   (take n

@@ -26,18 +26,27 @@
           (tx/to-hiccup (slurp r)))))
 
 (defn recent-posts-box [req]
-  [:div {:class "sidebox"}
-   [:h2 "Recent posts"]
-   [:p "Things I can remember"]
-   [:ul (map (fn [n] [:li ,n]) (range 0 4))]])
+  (let [pages (page/recent-pages 10 (:pages req))]
+    [:div {:class "sidebox"}
+     [:h2 "Recent posts"]
+     [:p "Things I can remember"]
+     [:ul (map (fn [p] [:li [:a {:href (page/url p)} (page/title p)]])
+               pages)]]))
 
 (defn by-month-box [req]
-  [:div {:class "sidebox"}
-   [:h2 "Archived posts"]
-   [:p "The tenured generation"]
-   [:ul (map (fn [n]
-               (vector :li n (map ytime/month-name (range 1 12))))
-             (range 2015 2001 -1))]])
+  (let [ymlink (fn [y m] [:a {:href (str "/" y "/" m)} (ytime/month-name m)])
+        pages (:pages req)
+        pages? (fn [y m] (seq (page/pages-in-month y m pages)))]
+    [:div {:class "sidebox"}
+     [:h2 "Archived posts"]
+     [:p "The tenured generation"]
+     [:ul (map (fn [y]
+                 (vector :li [:b y] " "
+                         (interpose
+                          " "
+                          (map (partial ymlink y)
+                               (filter (partial pages? y) (range 1 12))))))
+               (range 2015 2001 -1))]]))
 
 (defn stylify [hiccuper]
   (fn [req]
@@ -75,11 +84,19 @@
                                     (Integer. (:month p))
                                     (:pages req))))))
 
+(defn entry-by-y-m-slug [y m slug request]
+  (let [p (page/find-page (Integer. y) (Integer. m)
+                          slug (:pages request))]
+    [:article (hiccup-entry p)]))
+
+
 (defroutes handler
   (GET "/" [] (stylify recent-entries))
   (GET "/static/*" request
        (let [f (-> request :route-params :*)]
          (io/file (conf/static-folder (:conf request)) f)))
+  (GET "/:year{[0-9]+}/:month{[0-9]+}/:slug" [year month slug :as request]
+       (stylify (partial entry-by-y-m-slug year month slug)))
   (GET "/:year{[0-9]+}/:month{[0-9]+}" [year month]
        (stylify entries-for-month))
   (route/not-found "Page not found"))
