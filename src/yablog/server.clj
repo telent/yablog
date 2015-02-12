@@ -25,6 +25,20 @@
            [:h2 {:class "date"} (format-time (:date page))]]
           (tx/to-hiccup (slurp r)))))
 
+(defn recent-posts-box [req]
+  [:div {:class "sidebox"}
+   [:h2 "Recent posts"]
+   [:p "Things I can remember"]
+   [:ul (map (fn [n] [:li ,n]) (range 0 4))]])
+
+(defn by-month-box [req]
+  [:div {:class "sidebox"}
+   [:h2 "Archived posts"]
+   [:p "The tenured generation"]
+   [:ul (map (fn [n]
+               (vector :li n (map ytime/month-name (range 1 12))))
+             (range 2015 2001 -1))]])
+
 (defn stylify [hiccuper]
   (fn [req]
     (let [hic (hiccuper req)
@@ -43,6 +57,8 @@
          hic
          [:aside
           [:bio]
+          (recent-posts-box req)
+          (by-month-box req)]
          [:footer]
          ])))))
 
