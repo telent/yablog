@@ -31,3 +31,10 @@
 (assert (= (io/file "/tmp/hello/spong")
            (posts-folder {:base-folder  "/tmp/hello"
                           :posts "spong"})))
+
+(defn replacements [conf]
+  (let [base (static-folder conf)]
+    (reduce (fn [m [tag file]]
+              (assoc m [tag] (read-file (io/file base file))))
+            {}
+            (:replace conf))))

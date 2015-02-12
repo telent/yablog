@@ -9,6 +9,7 @@
             [yablog.page :as page]
             [yablog.conf :as conf]
             [yablog.time :as ytime]
+            [clojure.walk :as w]
             [texticlj.core :as tx]))
 
 (def date-formatter (ftime/formatters :rfc822))
@@ -26,25 +27,24 @@
 
 (defn stylify [hiccuper]
   (fn [req]
-    (let [hic (hiccuper req)]
+    (let [hic (hiccuper req)
+          conf (:conf req)]
       (hpage/html5
        [:head
-        [:link {:href (conf/stylesheet (:conf req))
+        [:link {:href (conf/stylesheet conf)
                 :rel "stylesheet"}]
-        [:title "diary at Telent Netowrks"]]
-       [:body
-        [:header
-         [:a {:href "/"}
-          [:div {:class "title"} "diary at Telent Netowrks"]]]
-        hic
-        [:aside
-         [:img {:src "/static/images/me.jpg"}]
-         [:p "There are many Daniel Barlows on the internet, but this one's me.  This blog contains geeky stuff about what I do, and in the older entries, what I used to do.  Clojure, Ruby, Linux, Android, Common Lisp, and thoughts about software development and matters arising. "]
-         [:p "I have other non-tech interests too, but I don't write about them much here.  Try me on "
-          [:a {:href "https://twitter.com/telent"} "Twitter"]
-          " for very short rants about a variety of stuff"]
-         ;; XXX add links to recent posts and by-month archive
-         ]]))))
+        [:title (:title conf)]]
+       (w/postwalk-replace
+        (conf/replacements conf)
+        [:body
+         [:header
+          [:a {:href "/"}
+           [:div {:class "title"} (:title conf)]]]
+         hic
+         [:aside
+          [:bio]
+         [:footer]
+         ])))))
 
 (defn recent-entries [req]
   (into [:article]
