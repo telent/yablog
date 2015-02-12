@@ -5,10 +5,10 @@
             [compojure.route :as route]
             [hiccup.core :as hiccup]
             [hiccup.page :as hpage]
-            [clj-time.core :as time]
             [clj-time.format :as ftime]
             [yablog.page :as page]
             [yablog.conf :as conf]
+            [yablog.time :as ytime]
             [texticlj.core :as tx]))
 
 (def date-formatter (ftime/formatters :rfc822))
