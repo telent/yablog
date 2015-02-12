@@ -8,6 +8,7 @@
             [clj-time.core :as time]
             [clj-time.format :as ftime]
             [yablog.page :as page]
+            [yablog.conf :as conf]
             [texticlj.core :as tx]))
 
 (def date-formatter (ftime/formatters :rfc822))
@@ -28,17 +29,19 @@
     (let [hic (hiccuper req)]
       (hpage/html5
        [:head
-        [:link {:href "/default.css" :rel "stylesheet"}]
+        [:link {:href (conf/stylesheet (:conf req))
+                :rel "stylesheet"}]
         [:title "diary at Telent Netowrks"]]
        [:body
         [:header
-         [:div {:class "title"} "diary at Telent Netowrks"]]
+         [:a {:href "/"}
+          [:div {:class "title"} "diary at Telent Netowrks"]]]
         hic
         [:aside
-         [:img {:src "/images/me.jpg"}]
+         [:img {:src "/static/images/me.jpg"}]
          [:p "There are many Daniel Barlows on the internet, but this one's me.  This blog contains geeky stuff about what I do, and in the older entries, what I used to do.  Clojure, Ruby, Linux, Android, Common Lisp, and thoughts about software development and matters arising. "]
          [:p "I have other non-tech interests too, but I don't write about them much here.  Try me on "
-          [:a {:href "https://tiwtter.com/telent"} "Twitter"]
+          [:a {:href "https://twitter.com/telent"} "Twitter"]
           " for very short rants about a variety of stuff"]
          ;; XXX add links to recent posts and by-month archive
          ]]))))
@@ -58,8 +61,9 @@
 
 (defroutes handler
   (GET "/" [] (stylify recent-entries))
-  (GET "/default.css" [] (io/resource "default.css"))
-  (GET "/fonts/*" request (fn [req] (io/resource (subs (:uri req) 1))))
-  (GET "/images/*" request (fn [req] (io/resource (subs (:uri req) 1))))
-  (GET "/:year/:month" [year month] (stylify entries-for-month))
+  (GET "/static/*" request
+       (let [f (-> request :route-params :*)]
+         (io/file (conf/static-folder (:conf request)) f)))
+  (GET "/:year{[0-9]+}/:month{[0-9]+}" [year month]
+       (stylify entries-for-month))
   (route/not-found "Page not found"))
