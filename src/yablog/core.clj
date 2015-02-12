@@ -8,6 +8,13 @@
 
 (defonce server (atom nil))
 
+;; XXX there's a lot of hardcoded that should be confg options
+;; 1) the css whould be outwith this project
+;; 2) and the fonts
+;; 3) and there should be some way to change the sidebar without
+;; editing source files
+
+
 (defn -main [conffile]
   (let [conffile (or conffile "conf.edn")
         conf (with-open [infile (java.io.PushbackReader. (io/reader conffile))]

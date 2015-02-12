@@ -39,7 +39,9 @@
          [:p "There are many Daniel Barlows on the internet, but this one's me.  This blog contains geeky stuff about what I do, and in the older entries, what I used to do.  Clojure, Ruby, Linux, Android, Common Lisp, and thoughts about software development and matters arising. "]
          [:p "I have other non-tech interests too, but I don't write about them much here.  Try me on "
           [:a {:href "https://tiwtter.com/telent"} "Twitter"]
-          " for very short rants about a variety of stuff"]]]))))
+          " for very short rants about a variety of stuff"]
+         ;; XXX add links to recent posts and by-month archive
+         ]]))))
 
 (defn recent-entries [req]
   (into [:article]
@@ -47,6 +49,7 @@
 
 (defn entries-for-month [req]
   (let [p (:route-params req)]
+    ;; XXX would be neat if it included "older" and "newer" links
     (into [:article]
           (map hiccup-entry
                (page/pages-in-month (Integer. (:year p))
