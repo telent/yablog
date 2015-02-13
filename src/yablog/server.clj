@@ -11,25 +11,9 @@
             [yablog.page :as page]
             [yablog.conf :as conf]
             [yablog.time :as ytime]
+            [yablog.hiccup :as hic]
             [clojure.walk :as w]
-            [clojure.xml :as xml]
-            [texticlj.core :as tx]))
-
-(def date-formatter (ftime/formatters :rfc822))
-
-(defn format-time [t]
-  (ftime/unparse date-formatter t))
-
-(defn hiccup-entry-body [page]
-  (with-open [r (io/reader (:pathname page))]
-    (page/read-headers r)
-    (tx/to-hiccup (slurp r))))
-
-(defn hiccup-entry [page]
-  (into [:div {:class "entry"}
-         [:h1 {:class "title"} (or (:subject page) (:title page))]
-         [:h2 {:class "date"} (format-time (:date page))]]
-        (hiccup-entry-body page)))
+            [clojure.xml :as xml]))
 
 (defn recent-posts-box [req]
   (let [pages (page/recent-pages 10 (:pages req))]
@@ -79,13 +63,13 @@
 
 (defn recent-entries [req]
   (into [:article]
-        (map hiccup-entry (page/recent-pages 5 (:pages req)))))
+        (map hic/hiccup-entry (page/recent-pages 5 (:pages req)))))
 
 (defn entries-for-month [req]
   (let [p (:route-params req)]
     ;; XXX would be neat if it included "older" and "newer" links
     (into [:article]
-          (map hiccup-entry
+          (map hic/hiccup-entry
                (page/pages-in-month (Integer. (:year p))
                                     (Integer. (:month p))
                                     (:pages req))))))
@@ -93,7 +77,6 @@
 (defn entry-by-y-m-slug [y m slug request]
   (let [p (page/find-page (Integer. y) (Integer. m)
                           slug (:pages request))]
-    [:article (hiccup-entry p)]))
 
 (defn rss-item [post]
   {:tag :item,
@@ -145,6 +128,7 @@
         :content ["Geeky stuff about what I do.  By Daniel Barlow"]}]
       (map rss-item posts))
      }]})
+    [:article (hic/hiccup-entry p)]))
 
 (defn handle-rss [req]
   (let [recent (page/recent-pages 10 (:pages req))
