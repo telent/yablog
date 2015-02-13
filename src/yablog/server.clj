@@ -4,7 +4,6 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [hiccup.core :as hiccup]
-            hiccup.util
             [hiccup.page :as hpage]
             [clj-time.core :as time]
             [clj-time.format :as ftime]
@@ -12,6 +11,7 @@
             [yablog.conf :as conf]
             [yablog.time :as ytime]
             [yablog.hiccup :as hic]
+            [yablog.rss :as rss]
             [clojure.walk :as w]
             [clojure.xml :as xml]))
 
@@ -77,64 +77,12 @@
 (defn entry-by-y-m-slug [y m slug request]
   (let [p (page/find-page (Integer. y) (Integer. m)
                           slug (:pages request))]
-
-(defn rss-item [post]
-  {:tag :item,
-   :attrs nil,
-   :content
-   [{:tag :title,
-     :attrs nil,
-     :content [(page/title post)]}
-    {:tag :link,
-     :attrs nil,
-     :content
-     [(page/url post)]}                 ;XXX absoluteize this?
-    {:tag :description,
-     :attrs nil,
-     :content
-     [(hiccup.util/escape-html (hiccup/html (hiccup-entry-body post)))]}
-    {:tag :author, :attrs nil, :content ["Daniel Barlow"]}
-    {:tag :pubDate,
-     :attrs nil,
-     :content [(format-time (:date post))]}
-    {:tag :guid,
-     :attrs nil,
-     :content [(page/url post)]
-     }
-    {:tag :dc:date,
-     :attrs nil,
-     :content [(ftime/unparse (ftime/formatters :date-time-no-ms)
-                              (:date post))]}
-    ]})
-
-(defn rss-posts [posts]
-  {:tag :rss,
-   :attrs
-   {:version "2.0",
-    :xmlns:content "http://purl.org/rss/1.0/modules/content/",
-    :xmlns:dc "http://purl.org/dc/elements/1.1/",
-    :xmlns:trackback
-    "http://madskills.com/public/xml/rss/module/trackback/",
-    :xmlns:itunes "http://www.itunes.com/dtds/podcast-1.0.dtd"},
-   :content
-   [{:tag :channel,
-     :attrs nil,
-     :content
-     (into
-      [{:tag :title, :attrs nil, :content ["diary at Telent Netowrks"]}
-       {:tag :link, :attrs nil, :content ["http://ww.telent.net/"]}
-       {:tag :description,
-        :attrs nil,
-        :content ["Geeky stuff about what I do.  By Daniel Barlow"]}]
-      (map rss-item posts))
-     }]})
     [:article (hic/hiccup-entry p)]))
 
 (defn handle-rss [req]
   (let [recent (page/recent-pages 10 (:pages req))
-        xml (rss-posts recent)
+        xml (rss/rss-posts recent)
         body (with-out-str (xml/emit xml))]
-    #_ (clojure.pprint/pprint xml)
     {:status 200
      :headers {"Content-Type" "application/rss+xml; charset=utf-8"}
      :body body}))
