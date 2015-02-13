@@ -61,9 +61,11 @@
   (time/within? interval (:date page) ))
 
 (defn pages-in-month [y m pages]
-  (filter (partial page-in-date-interval?
-                   (date-interval-for y m))
-          (vals pages)))
+  (sort-by :date
+           (org.joda.time.DateTimeComparator/getInstance)
+           (filter (partial page-in-date-interval?
+                            (date-interval-for y m))
+                   (vals pages))))
 
 (defn find-page [y m slug pages]
   (get pages (str "/" y "/" m "/" slug)))
