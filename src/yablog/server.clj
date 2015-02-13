@@ -12,6 +12,7 @@
             [yablog.time :as ytime]
             [yablog.hiccup :as hic]
             [yablog.rss :as rss]
+            [ring.util.response :as resp]
             [clojure.walk :as w]
             [clojure.xml :as xml]))
 
@@ -24,7 +25,7 @@
                pages)]]))
 
 (defn by-month-box [req]
-  (let [ymlink (fn [y m] [:a {:href (str "/" y "/" m)} (ytime/month-name m)])
+  (let [ymlink (fn [y m] [:a {:href (str "/" y "/" m "/")} (ytime/month-name m)])
         pages (:pages req)
         pages? (fn [y m] (seq (page/pages-in-month y m pages)))]
     [:div {:class "sidebox"}
@@ -95,6 +96,11 @@
          (io/file (conf/static-folder (:conf request)) f)))
   (GET "/:year{[0-9]+}/:month{[0-9]+}/:slug" [year month slug :as request]
        (stylify (partial entry-by-y-m-slug year month slug)))
-  (GET "/:year{[0-9]+}/:month{[0-9]+}" [year month]
+  (GET "/:year{[0-9]+}/:month{[0-9]+}/" [year month]
        (stylify entries-for-month))
+  (GET "/:year{[0-9]+}/:month{[0-9]+}" [year month]
+       (resp/redirect (str "/" year "/" month "/")))
+
+  (GET "/diary/*" [*] (resp/redirect (str "/" *)))
+
   (route/not-found "Page not found"))
