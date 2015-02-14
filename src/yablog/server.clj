@@ -100,7 +100,7 @@
 
 (defn handle-rss [req]
   (let [recent (page/recent-pages 10 (:pages req))
-        xml (rss/rss-posts recent)
+        xml (rss/rss-posts (:conf req) recent)
         body (with-out-str (xml/emit xml))]
     {:status 200
      :headers {"Content-Type" "application/rss+xml; charset=utf-8"}
