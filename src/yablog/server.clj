@@ -67,13 +67,24 @@
         (map hic/hiccup-entry (page/recent-pages 5 (:pages req)))))
 
 (defn entries-for-month [req]
-  (let [p (:route-params req)]
+  (let [p (:route-params req)
+        y (Integer. (:year p))
+        m (Integer. (:month p))
+        next-month (time/plus (time/date-time y m) (time/months 1))
+        prev-month (time/minus (time/date-time y m) (time/months 1))]
     ;; XXX would be neat if it included "older" and "newer" links
-    (into [:article]
-          (map hic/hiccup-entry
-               (page/pages-in-month (Integer. (:year p))
-                                    (Integer. (:month p))
-                                    (:pages req))))))
+    (conj
+     (into [:article]
+           (map hic/hiccup-entry
+                (page/pages-in-month y m (:pages req))))
+     [:div {:class "nav"}
+      [:a {:href (ftime/unparse (ftime/formatter "/yyyy/M/") prev-month)}
+       "&#x27ea;" (ftime/unparse (ftime/formatter "MMM yyyy") prev-month)]
+      " "
+      [:a {:href (ftime/unparse (ftime/formatter "/yyyy/M/") next-month)}
+       (ftime/unparse (ftime/formatter "MMM yyyy") next-month)   "&#x27eb;"]
+      ])))
+
 
 (defn entry-by-y-m-slug [y m slug request]
   (let [p (page/find-page (Integer. y) (Integer. m)
