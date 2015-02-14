@@ -58,18 +58,17 @@
         [:body
          [:header
           [:a {:href "/"}
-           [:div {:class "title"}
-            (str/join " - " (remove not [title (:title conf)]))]]]
+           [:div {:class "title"} (:title conf)]]]
          hic
          [:aside
           [:bio]
           (recent-posts-box req)
           (by-month-box req)]
-         [:footer]
-         ])))))
+         [:footer]])))))
+
 
 (defn recent-entries [req]
-  (into [:article {:data-title "Recent entries"}
+  (into [:article {:data-title "Recently"}]
         (map hic/hiccup-entry (page/recent-pages 5 (:pages req)))))
 
 (defn entries-for-month [req]
@@ -82,7 +81,7 @@
     ;; XXX would be neat if it included "older" and "newer" links
     (conj
      (into [:article
-            {:data-title (ftime/unparse (ftime/formatter "MMM yyyy") start)}]
+            {:data-title (ftime/unparse (ftime/formatter "MMMMMM yyyy") start)}]
            (map hic/hiccup-entry
                 (page/pages-in-month y m (:pages req))))
      [:div {:class "nav"}
