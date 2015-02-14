@@ -14,6 +14,7 @@
             [yablog.rss :as rss]
             [ring.util.response :as resp]
             [clojure.walk :as w]
+            [clojure.string :as str]
             [clojure.xml :as xml]))
 
 (defn recent-posts-box [req]
@@ -51,14 +52,14 @@
        [:head
         [:link {:href (conf/stylesheet conf)
                 :rel "stylesheet"}]
-        [:title title " - " (:title conf)]]
+        [:title (str/join " - " (remove not [title (:title conf)]))]]
        (w/postwalk-replace
         (conf/replacements conf)
         [:body
          [:header
           [:a {:href "/"}
            [:div {:class "title"}
-            title " - " (:title conf)]]]
+            (str/join " - " (remove not [title (:title conf)]))]]]
          hic
          [:aside
           [:bio]
