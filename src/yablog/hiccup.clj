@@ -19,6 +19,9 @@
 
 (defn hiccup-entry [page]
   (into [:div {:class "entry"}
-         [:h1 {:class "title"} (or (:subject page) (:title page))]
+         [:h1 {:class "title"}
+          (page/title page)
+          [:span {:class "permalink"}
+           [:a {:href (page/url page)} "#"]]]
          [:h2 {:class "date"} (format-time (:date page))]]
         (hiccup-entry-body page)))
