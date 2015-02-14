@@ -42,18 +42,23 @@
 (defn stylify [hiccuper]
   (fn [req]
     (let [hic (hiccuper req)
+          title (:data-title
+                 (second
+                  (first (filter #(= (first %) :article)
+                                 (tree-seq vector? rest hic)))))
           conf (:conf req)]
       (hpage/html5
        [:head
         [:link {:href (conf/stylesheet conf)
                 :rel "stylesheet"}]
-        [:title (:title conf)]]
+        [:title title " - " (:title conf)]]
        (w/postwalk-replace
         (conf/replacements conf)
         [:body
          [:header
           [:a {:href "/"}
-           [:div {:class "title"} (:title conf)]]]
+           [:div {:class "title"}
+            title " - " (:title conf)]]]
          hic
          [:aside
           [:bio]
@@ -63,18 +68,20 @@
          ])))))
 
 (defn recent-entries [req]
-  (into [:article]
+  (into [:article {:data-title "Recent entries"}
         (map hic/hiccup-entry (page/recent-pages 5 (:pages req)))))
 
 (defn entries-for-month [req]
   (let [p (:route-params req)
         y (Integer. (:year p))
         m (Integer. (:month p))
-        next-month (time/plus (time/date-time y m) (time/months 1))
-        prev-month (time/minus (time/date-time y m) (time/months 1))]
+        start (time/date-time y m)
+        next-month (time/plus start (time/months 1))
+        prev-month (time/minus start (time/months 1))]
     ;; XXX would be neat if it included "older" and "newer" links
     (conj
-     (into [:article]
+     (into [:article
+            {:data-title (ftime/unparse (ftime/formatter "MMM yyyy") start)}]
            (map hic/hiccup-entry
                 (page/pages-in-month y m (:pages req))))
      [:div {:class "nav"}
@@ -85,11 +92,11 @@
        (ftime/unparse (ftime/formatter "MMM yyyy") next-month)   "&#x27eb;"]
       ])))
 
-
 (defn entry-by-y-m-slug [y m slug request]
   (let [p (page/find-page (Integer. y) (Integer. m)
                           slug (:pages request))]
-    [:article (hic/hiccup-entry p)]))
+    [:article {:data-title (page/title p)}
+     (hic/hiccup-entry p)]))
 
 (defn handle-rss [req]
   (let [recent (page/recent-pages 10 (:pages req))
