@@ -38,10 +38,11 @@
   (or (:title page) (:subject page)))
 
 (defn url [page]
-  (let [d (:date page)
-        y (time/year d)
-        m (time/month d)]
-    (str "/" y "/" m "/" (slug (title page)))))
+  (if-let [d (:date page)]
+    (let [y (time/year d)
+          m (time/month d)]
+      (str "/" y "/" m "/" (slug (title page))))
+    (slug (title page))))
 
 (defn read-pages [path]
   (let [names (filter textile? (file-seq (io/file path)))]
