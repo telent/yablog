@@ -10,6 +10,7 @@
             [yablog.page :as page]
             [yablog.conf :as conf]
             [yablog.time :as ytime]
+            [yablog.flickr :as flickr]
             [yablog.hiccup :as hic]
             [yablog.rss :as rss]
             [ring.util.response :as resp]
@@ -42,12 +43,15 @@
 
 (defn stylify [hiccuper]
   (fn [req]
-    (let [hic (hiccuper req)
+    (let [conf (:conf req)
+          hic (w/postwalk
+               (partial flickr/populate-photo-divs (:flickr-api-key conf))
+               (hiccuper req))
           title (:data-title
                  (second
                   (first (filter #(= (first %) :article)
                                  (tree-seq vector? rest hic)))))
-          conf (:conf req)]
+          ]
       (hpage/html5
        [:head
         [:link {:href (conf/stylesheet conf)
