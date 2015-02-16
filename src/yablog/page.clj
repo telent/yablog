@@ -71,6 +71,9 @@
 (defn find-page [y m slug pages]
   (get pages (str "/" y "/" m "/" slug)))
 
+(defn find-by-pathname [file pages]
+  (first (filter #(= (:pathname %) file) (vals pages))))
+
 (defn recent-pages [n pages]
   (take n
         (reverse
