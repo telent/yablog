@@ -59,7 +59,6 @@
                (.startsWith (get attrs :class) "flickr-photo")
                (get attrs :photo_id))
         (let [info (photo-info api-key (get attrs :photo_id))]
-          (println info)
           [:div attrs
            [:a {:href (photo-page info)}
             [:img {:src (photo-image-url info 300)}]
