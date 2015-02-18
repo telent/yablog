@@ -1,6 +1,7 @@
 datetimeandzone = (dayname sp)? datetime (sp zone)?
 sp = #'[ ,]+'
 day = #'\d{1,2}'
+monthnum = #'[01]?\d'
 year = #'\d{4}'
 hour = #'[012]?\d'
 min = #'\d?\d'
@@ -8,7 +9,8 @@ sec = #'\d?\d'
 time = hour ':' min ':' sec
 dayandmonth = monthname sp day | day sp monthname
 datetime =  dayandmonth sp time sp year |
-            dayandmonth sp year sp time 
+            dayandmonth sp year sp time |
+	    year '-' monthnum '-' day sp time
 dayname = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun' 
 monthname = 'jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun' |
             'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec'
