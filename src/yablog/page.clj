@@ -41,8 +41,9 @@
   (if-let [title (title page)]
     (if-let [d (:date page)]
       (let [y (time/year d)
-            m (time/month d)]
-        (str "/" y "/" m "/" (slug title)))
+            m (time/month d)
+            d (time/day d)]
+        (str "/" y "/" m "/" d "/" (slug title)))
       (slug title))))
 
 (defn read-pages [path]
@@ -69,8 +70,8 @@
                             (date-interval-for y m))
                    (vals pages))))
 
-(defn find-page [y m slug pages]
-  (get pages (str "/" y "/" m "/" slug)))
+(defn find-page [y m d slug pages]
+  (get pages (str "/" y "/" m "/" d "/" slug)))
 
 (defn find-by-pathname [file pages]
   (first (filter #(= (:pathname %) file) (vals pages))))

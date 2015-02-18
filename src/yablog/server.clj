@@ -96,8 +96,10 @@
        (ftime/unparse (ftime/formatter "MMM yyyy") next-month)   "&#x27eb;"]
       ])))
 
-(defn entry-by-y-m-slug [y m slug request]
-  (let [p (page/find-page (Integer. y) (Integer. m)
+(defn entry-by-y-m-d-slug [y m d slug request]
+  (let [p (page/find-page (Integer. y)
+                          (Integer. m)
+                          (Integer. d)
                           slug (:pages request))]
     [:article {:data-title (page/title p)}
      (hic/hiccup-entry p)]))
@@ -116,8 +118,8 @@
   (GET "/static/*" request
        (let [f (-> request :route-params :*)]
          (io/file (conf/static-folder (:conf request)) f)))
-  (GET "/:year{[0-9]+}/:month{[0-9]+}/:slug" [year month slug :as request]
-       (stylify (partial entry-by-y-m-slug year month slug)))
+  (GET "/:year{[0-9]+}/:month{[0-9]+}/:day{[0-9]+}/:slug" [year month day slug :as request]
+       (stylify (partial entry-by-y-m-d-slug year month day slug)))
   (GET "/:year{[0-9]+}/:month{[0-9]+}/" [year month]
        (stylify entries-for-month))
   (GET "/:year{[0-9]+}/:month{[0-9]+}" [year month]
