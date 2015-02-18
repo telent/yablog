@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [instaparse.core :as parse]
+            [clojure.set :as set]
             [instaparse.failure :as pfail]
             [clj-time.core :as time] ))
 
@@ -11,7 +12,7 @@
              "jul" 7 "aug" 8 "sep" 9 "oct" 10 "nov" 11 "dec" 12})
 
 (defn month-name [n]
-  (str/capitalize (get (clojure.set/map-invert months) n)))
+  (str/capitalize (get (set/map-invert months) n)))
 
 (defn read-datetime [s]
   (let [tree (parse-datetime (str/trim (str/lower-case s)))
