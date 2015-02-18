@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e 
 HOST=sehll.telent.net
 (cd ../texticlj && lein install) 
 lein uberjar
