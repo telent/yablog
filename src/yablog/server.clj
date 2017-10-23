@@ -56,6 +56,10 @@
        [:head
         [:link {:href (conf/stylesheet conf)
                 :rel "stylesheet"}]
+        [:link {:rel "alternate"
+                :type "application/rss+xml"
+                :title "RSS"
+                :href "/news.rss"}]
         [:title (str/join " - " (remove not [title (:title conf)]))]]
        (w/postwalk-replace
         (conf/replacements conf)
