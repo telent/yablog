@@ -1,36 +1,34 @@
-# yablog
+# Yet Another Blog Engine
 
-FIXME: description
+As the name suggests.  Serves my personal blog, which is a collection
+of Textile files.
 
 ## Installation
 
-Download from http://example.com/FIXME.
+* download JAR from Github releases
 
 ## Usage
 
-FIXME: explanation
+Create an EDN file with configuration.  For example
 
-    $ java -jar yablog-0.1.0-standalone.jar [args]
+```
+{
+ :base-folder "/var/www/blogs/telent.blog"
+ :base-url "http://ww.telent.net/"
+ :title "diary at Telent Netowrks"
+ :description "Daniel Barlow's tech blog"
+ :author "dan@telent.net (Daniel Barlow)"
+ }
+```
 
-## Options
 
-FIXME: listing of options this app accepts.
+Then run
 
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+    $ java -jar yablog-0.1.0-standalone.jar conf.edn
 
 ## License
 
-Copyright © 2015 FIXME
+Copyright © 2015 Daniel Barlow
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
