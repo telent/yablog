@@ -1,5 +1,7 @@
+(def majorminor (clojure.string/trim-newline (slurp "VERSION")))
 (def patchlevel (or (System/getenv "PATCH_LEVEL") "0-SNAPSHOT"))
-(defproject yablog (str "0.1." patchlevel)
+
+(defproject yablog (str majorminor "." patchlevel)
   :description "Yet another blog engine"
   :url "https://github.com/telent/yablog"
   :license {:name "Eclipse Public License"
