@@ -42,4 +42,4 @@ jobs:
         
       # run tests!
       - run: lein test
-      - run: PATCH_LEVEL=`git rev-list HEAD --count`  ruby push_github_release.rb target/*.jar
+      - run: PATCH_LEVEL=`git rev-list HEAD --count`  ruby push_github_release.rb target/uberjar/yablog-0.1.0-SNAPSHOT-standalone.jar
