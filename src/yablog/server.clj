@@ -39,7 +39,7 @@
                           " "
                           (map (partial ymlink y)
                                (filter (partial pages? y) (range 1 12))))))
-               (range 2015 2001 -1))]]))
+               (range (.getYear (java.time.LocalDate/now)) 2001 -1))]]))
 
 (defn stylify [hiccuper]
   (fn [req]

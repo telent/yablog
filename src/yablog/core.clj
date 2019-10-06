@@ -1,13 +1,13 @@
 (ns yablog.core
-  (require [yablog.server :as server]
-           [clojure.java.io :as io]
-           [clojure.edn :as edn]
-           [aleph.http :as http]
-           [yablog.conf :as conf]
-           [yablog.file-events :as file-events]
-           [clojure.core.async :as async
-            :refer [timeout >!! >! <! alts! go chan]]
-           [yablog.page :as page])
+  (:require [yablog.server :as server]
+            [clojure.java.io :as io]
+            [clojure.edn :as edn]
+            [aleph.http :as http]
+            [yablog.conf :as conf]
+            [yablog.file-events :as file-events]
+            [clojure.core.async :as async
+             :refer [timeout >!! >! <! alts! go chan]]
+            [yablog.page :as page])
   (:gen-class))
 
 (defonce server (atom nil))
