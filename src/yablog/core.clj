@@ -5,7 +5,8 @@
             [aleph.http :as http]
             [yablog.conf :as conf]
             [yablog.file-events :as file-events]
-            [clojure.core.async :as async
+            [clojure.core.async
+             :as async
              :refer [timeout >!! >! <! alts! go chan]]
             [yablog.page :as page])
   (:gen-class))
@@ -14,7 +15,7 @@
 
 (defn handle-file-change [folder pages event]
   (let [file (:file event)]
-    (when (page/textile? file)
+    (when (page/renderable? file)
       (println [:update file])
       (when-let [u (page/url (page/find-by-pathname file @pages))]
         (swap! pages dissoc u))

@@ -2,10 +2,12 @@
   (:require [clojure.java.io :as io]
             [hiccup.core :as hiccup]
             [texticlj.core :as tx]
+            [markdown.core :as md]
             [hiccup.page :as hpage]
             [yablog.page :as page]
             [clj-time.format :as ftime]
-            hiccup.util))
+            hiccup.util)
+  (:import [java.io StringWriter]))
 
 (def date-formatter (ftime/formatters :rfc822))
 
@@ -15,7 +17,12 @@
 (defn hiccup-entry-body [page]
   (with-open [r (io/reader (:pathname page))]
     (page/read-headers r)
-    (tx/to-hiccup (slurp r))))
+    (cond (page/textile? (:pathname page))
+          (tx/to-hiccup (slurp r))
+          (page/markdown? (:pathname page))
+          (let [w (new StringWriter)]
+            (md/md-to-html r w)
+            (.toString w)))))
 
 (defn hiccup-entry [page]
   (into [:div {:class "entry"}

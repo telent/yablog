@@ -11,6 +11,7 @@
                  [clj-time "0.15.2"]
                  [compojure "1.6.2"]
                  [hiccup "1.0.5"]
+                 [markdown-clj "1.10.5"]
                  [juxt/dirwatch "0.2.5"]
                  [org.clojure/core.async "1.3.610"]
                  [org.clojure/data.json "1.0.0"]

@@ -25,6 +25,13 @@
        (.exists filename)
        (.canRead filename)))
 
+(defn markdown? [filename]
+  (and (.endsWith (.toString filename) ".md")
+       (.exists filename)
+       (.canRead filename)))
+
+(defn renderable? [x] (or (textile? x) (markdown? x)))
+
 (defn slug [name]
   (str/lower-case
    (str/replace
@@ -47,7 +54,7 @@
       (slug title))))
 
 (defn read-pages [path]
-  (let [names (filter textile? (file-seq (io/file path)))]
+  (let [names (filter renderable? (file-seq (io/file path)))]
     (reduce (fn [m name]
               (let [h (read-page name)]
                 (assoc m (url h) h)))
