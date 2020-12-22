@@ -1,6 +1,6 @@
 (ns yablog.conf
-  (require [clojure.java.io :as io]
-           [clojure.edn :as edn] ))
+  (:require [clojure.java.io :as io]
+            [clojure.edn :as edn] ))
 
 (defn read-file [conffile]
   (with-open [infile (java.io.PushbackReader. (io/reader conffile))]
